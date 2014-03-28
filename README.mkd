@@ -1,4 +1,4 @@
-*A library of externs for Pure Data and Max/MSP*
+**A library of externs for Pure Data and Max/MSP**
 
 Requires flext for compilation
 
