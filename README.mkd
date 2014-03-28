@@ -7,3 +7,7 @@ Includes:
 fo - factor oracle
 
 ao - audio oracle
+
+
+
+**See Downloads tab for binaries and help files**
