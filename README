@@ -1,0 +1,9 @@
+A library of externs for Pure Data and Max/MSP
+######
+
+Requires flext for compilation
+
+Includes:
+
+fo - factor oracle
+ao - audio oracle
