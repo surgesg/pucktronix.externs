@@ -1,0 +1,2 @@
+NAME=fo
+SRCS=main.cpp

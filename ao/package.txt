@@ -1,0 +1,2 @@
+NAME=ao
+SRCS=main.cpp

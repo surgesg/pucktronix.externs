@@ -1,0 +1,136 @@
+#N canvas 271 37 926 659 10;
+#X msg 14 82 init;
+#X obj 14 493 fo;
+#X msg 568 253 print_sfx;
+#X obj 83 24 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+;
+#X msg 83 98 add_state \$1;
+#X msg 572 287 print_trn;
+#X floatatom 14 578 5 0 0 0 - - -;
+#X msg 415 167 next_state;
+#X obj 14 24 loadbang;
+#X floatatom 29 554 5 0 0 0 - - -;
+#X obj 415 113 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 66 554 next_state;
+#X floatatom 46 528 5 0 0 0 - - -;
+#X obj 327 47 savepanel;
+#X msg 327 73 save \$1;
+#X obj 327 24 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 83 53 metro 100;
+#X obj 415 138 metro 100;
+#X msg 674 166 set_p \$1;
+#X floatatom 674 134 5 0 1 0 - - -;
+#X text 390 43 save oracle to;
+#X text 391 57 file;
+#X obj 83 75 drunk 127 10;
+#X text 172 65 construct oracle;
+#X text 487 139 navigate oracle;
+#X text 486 153 for generative recombination;
+#X text 486 167 of original sequence;
+#X text 172 49 generate sequence and;
+#X text 49 576 number of oracle states;
+#X text 81 527 value at next state;
+#X text 735 132 change recombination;
+#X text 736 148 probability (jump);
+#X text 736 166 float 0-1;
+#X text 645 33 fo - factor oracle in pd/max;
+#X text 646 49 2014 greg surges;
+#X text 736 182 higher values produce;
+#X text 736 198 output more similar to;
+#X text 736 214 original sequence;
+#X obj 737 237 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 737 258 toggle_regions \$1;
+#X floatatom 736 291 5 0 0 0 - - -;
+#X floatatom 787 290 5 0 0 0 - - -;
+#X obj 736 336 pack 1 1;
+#X obj 754 314 t b f;
+#X msg 736 359 set_region \$1 \$2;
+#X text 556 468 lower region bounds are not working;
+#X msg 232 288 get_ir;
+#X msg 573 342 print_lrs;
+#X obj 91 201 metro 100;
+#X obj 97 176 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 77 270 add_state \$1;
+#X obj 91 233 random 8;
+#X obj 314 480 zl group 1;
+#X obj 393 535 int;
+#X obj 313 567 tabwrite array1;
+#N canvas 0 22 450 278 (subpatch) 0;
+#X array array1 83 float 1;
+#A 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.12577 1.12577 0 1.06015
+1.06015 1.02945 1.02945 1.77398 1.77398 1.77398 0.971708 0.971708 0.944484
+0.944484 0 0 1.00599 1.00599 0.982333 0.982333 0.959432 0.959432 0.937235
+0.937235 0.9157 0.9157 0 0.874469 0.874469 0 0.835468 0.835468 0.81673
+0.81673 0 0 0.763273 0.763273 0 2.09457 2.09457 2.09457 2.09457 0.713505
+0.713505 0 0.682137 0.682137 0.66695 0.66695 0.652077 0.652077 1.57815
+1.57815 1.57815 0 0 0 0.707519 0.707519 0.694283 0.694283 0 0;
+#X coords 0 10 82 0 200 140 1 0 0;
+#X restore 596 501 graph;
+#X obj 330 508 t f b;
+#X obj 420 534 + 1;
+#X msg 404 492 0;
+#X obj 175 611 f;
+#X obj 216 572 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 223 620 \; array1 resize \$1;
+#X obj 487 24 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 550 43 save oracle to;
+#X text 551 57 file;
+#X obj 487 47 openpanel;
+#X msg 487 73 load \$1;
+#X connect 0 0 1 0;
+#X connect 1 0 6 0;
+#X connect 1 1 9 0;
+#X connect 1 2 12 0;
+#X connect 1 3 52 0;
+#X connect 2 0 1 0;
+#X connect 3 0 16 0;
+#X connect 4 0 1 0;
+#X connect 5 0 1 0;
+#X connect 6 0 59 1;
+#X connect 7 0 1 0;
+#X connect 8 0 0 0;
+#X connect 10 0 17 0;
+#X connect 13 0 14 0;
+#X connect 14 0 1 0;
+#X connect 15 0 13 0;
+#X connect 16 0 22 0;
+#X connect 16 0 46 0;
+#X connect 17 0 7 0;
+#X connect 18 0 1 0;
+#X connect 19 0 18 0;
+#X connect 22 0 4 0;
+#X connect 38 0 39 0;
+#X connect 39 0 1 0;
+#X connect 40 0 42 0;
+#X connect 41 0 43 0;
+#X connect 42 0 44 0;
+#X connect 43 0 42 0;
+#X connect 43 1 42 1;
+#X connect 44 0 1 0;
+#X connect 46 0 1 0;
+#X connect 46 0 58 0;
+#X connect 46 0 60 0;
+#X connect 47 0 1 0;
+#X connect 48 0 51 0;
+#X connect 48 0 46 0;
+#X connect 49 0 48 0;
+#X connect 50 0 1 0;
+#X connect 51 0 50 0;
+#X connect 52 0 56 0;
+#X connect 53 0 57 0;
+#X connect 53 0 54 1;
+#X connect 56 0 54 0;
+#X connect 56 1 53 0;
+#X connect 57 0 53 1;
+#X connect 58 0 53 1;
+#X connect 59 0 61 0;
+#X connect 60 0 59 0;
+#X connect 62 0 65 0;
+#X connect 65 0 66 0;
+#X connect 66 0 1 0;

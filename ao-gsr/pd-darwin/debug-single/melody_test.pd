@@ -1,0 +1,122 @@
+#N canvas 226 146 910 564 10;
+#X msg 44 156 init;
+#X obj 44 199 fo;
+#X msg 184 174 print_sfx;
+#X msg 277 225 add_state \$1;
+#X msg 90 148 add_state \$1;
+#X obj 89 106 random 127;
+#X obj 85 60 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 361 170 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 186 197 print_trn;
+#X floatatom 44 230 5 0 0 0 - - -;
+#X msg 385 212 next_state;
+#X obj 30 102 loadbang;
+#X floatatom 107 258 5 0 0 0 - - -;
+#X obj 411 144 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 142 257 next_state;
+#X text 80 229 n_states;
+#X floatatom 164 296 5 0 0 0 - - -;
+#X text 199 295 val at next state;
+#X obj 277 197 drunk 127 10;
+#X obj 280 152 until 25;
+#N canvas 0 22 450 278 (subpatch) 0;
+#X array array1 100 float 3;
+#A 0 4603.01 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5
+187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5
+187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5
+187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5
+187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5
+187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5
+187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5
+187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5 187.5
+187.5 187.5 187.5 187.5 187.5 187.5;
+#X coords 0 1000 99 0 200 140 1 0 0;
+#X restore 530 391 graph;
+#X msg 286 122 25;
+#X obj 354 369 mtof;
+#X obj 359 421 osc~;
+#X obj 354 521 dac~;
+#X msg 220 95 set_p \$1;
+#X floatatom 207 52 5 0 0 0 - - -;
+#X obj 659 81 seq;
+#X msg 593 48 bang;
+#X msg 592 81 stop;
+#X obj 709 127 midiparse;
+#X obj 691 180 stripnote;
+#X floatatom 688 205 5 0 0 0 - - -;
+#X obj 737 236 timer;
+#X floatatom 737 266 5 0 0 0 - - -;
+#X obj 754 211 t b b;
+#X obj 576 281 int;
+#X obj 616 277 + 1;
+#X obj 540 255 t f b;
+#X obj 537 337 tabwrite array1;
+#X msg 578 244 0;
+#X obj 411 169 metro 187;
+#X obj 357 479 *~ 0.6;
+#X obj 53 392 metro 333;
+#X obj 64 338 tabread array1;
+#X obj 25 347 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X floatatom 144 377 5 0 0 0 - - -;
+#X obj 263 338 + 12;
+#X obj 602 314 mod 500;
+#X msg 656 55 read cs1-1pre.mid;
+#X floatatom 664 325 5 0 0 0 - - -;
+#X msg 203 145 print_lrs;
+#X connect 0 0 1 0;
+#X connect 1 0 9 0;
+#X connect 1 1 12 0;
+#X connect 1 2 16 0;
+#X connect 2 0 1 0;
+#X connect 3 0 1 0;
+#X connect 4 0 1 0;
+#X connect 5 0 4 0;
+#X connect 6 0 5 0;
+#X connect 8 0 1 0;
+#X connect 10 0 1 0;
+#X connect 11 0 0 0;
+#X connect 12 0 44 0;
+#X connect 13 0 41 0;
+#X connect 16 0 47 0;
+#X connect 18 0 3 0;
+#X connect 19 0 7 0;
+#X connect 19 0 18 0;
+#X connect 21 0 19 0;
+#X connect 22 0 23 0;
+#X connect 23 0 42 0;
+#X connect 25 0 1 0;
+#X connect 26 0 25 0;
+#X connect 27 0 30 0;
+#X connect 28 0 27 0;
+#X connect 28 0 40 0;
+#X connect 29 0 27 0;
+#X connect 30 0 31 0;
+#X connect 31 0 32 0;
+#X connect 31 1 35 0;
+#X connect 32 0 4 0;
+#X connect 32 0 22 0;
+#X connect 33 0 34 0;
+#X connect 33 0 38 0;
+#X connect 35 0 33 0;
+#X connect 35 1 33 1;
+#X connect 36 0 37 0;
+#X connect 36 0 48 0;
+#X connect 37 0 36 1;
+#X connect 38 0 39 0;
+#X connect 38 1 36 0;
+#X connect 40 0 36 1;
+#X connect 41 0 10 0;
+#X connect 42 0 24 0;
+#X connect 43 0 10 0;
+#X connect 44 0 43 1;
+#X connect 44 0 46 0;
+#X connect 45 0 43 0;
+#X connect 47 0 22 0;
+#X connect 48 0 39 1;
+#X connect 48 0 50 0;
+#X connect 49 0 27 0;
+#X connect 51 0 1 0;

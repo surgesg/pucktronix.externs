@@ -1,0 +1,665 @@
+#N canvas 463 172 959 691 10;
+#X msg -23 -4 init;
+#X msg 81 165 print_sfx;
+#X msg 94 191 print_trn;
+#X floatatom -23 612 5 0 0 0 - - -;
+#X msg 141 305 next_state;
+#X floatatom -8 588 5 0 0 0 - - -;
+#X text 29 588 next_state;
+#X floatatom 9 562 5 0 0 0 - - -;
+#X text 12 610 number of oracle states;
+#X text 44 561 value at next state;
+#X msg 133 275 get_ir;
+#X msg 121 248 print_lrs;
+#X obj -23 487 ao;
+#X msg 107 218 print_rsfx;
+#N canvas 187 324 963 411 training 0;
+#X floatatom -20 370 5 0 0 0 - - -;
+#X floatatom -5 346 5 0 0 0 - - -;
+#X text 32 346 next_state;
+#X floatatom 12 320 5 0 0 0 - - -;
+#X text 15 368 number of oracle states;
+#X text 47 319 value at next state;
+#X obj -20 268 ao;
+#X obj 50 89 mfcc~ 1024 100;
+#X obj 50 31 adc~;
+#X obj 120 54 metro 100;
+#X obj 120 31 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 101 186 train 1e-05 0.1 0.01;
+#X text 157 88 requires william brent's timbreID library: http://williambrent.conflations.com/pages/research.html
+;
+#X obj -20 31 loadbang;
+#X msg -20 53 init;
+#X obj 50 126 prepend add_state;
+#X text 233 186 2;
+#X text 530 25 audio oracle (ao) uses a distance threshold to enable
+fuzzy matching between audio frames. this threshold needs to be trained
+for each new signal. through analyzing the music information rate (ir)
+of the signal \, we can determine the best threshold for a given signal.
+this process is demonstrated here.;
+#X text 527 320 for more information \, see: Surges \, Greg \, and
+Shlomo Dubnov. "Feature Selection and Composition Using PyOracle."
+Ninth Artificial Intelligence and Interactive Digital Entertainment
+Conference. 2013;
+#X text 143 30 1;
+#X text 529 112 first \, click [1] to begin to capture new audio frames.
+the mfcc~ object provides a representation of the spectral envelope
+of the input signal. after a segment of audio has been captured \,
+turn off the toggle.;
+#X text 528 173 next \, using the "train" message [2] \, the ao object
+will perform an iterative analysis of the signal using a range of distance
+thresholds \, in order to determine the best threshold. the arguments
+to the train message are 1) the low end of the threshold range \, 2)
+the high end of the threshold range \, and 3) the size of the step
+between each threshold. after the training process completes \, the
+new "ideal" threshold will be stored and the oracle should be reset.
+the next incoming audio feature stream will be analyzed according to
+this ideal threshold.;
+#X connect 6 0 0 0;
+#X connect 6 1 1 0;
+#X connect 6 2 3 0;
+#X connect 7 0 15 0;
+#X connect 8 0 7 0;
+#X connect 9 0 7 0;
+#X connect 10 0 9 0;
+#X connect 11 0 6 0;
+#X connect 13 0 14 0;
+#X connect 14 0 6 0;
+#X connect 15 0 6 0;
+#X restore -286 54 pd training;
+#N canvas 223 88 1180 739 navigation 0;
+#X msg -229 74 init;
+#X floatatom -229 600 5 0 0 0 - - -;
+#X msg 169 388 next_state;
+#X obj -229 16 loadbang;
+#X floatatom -40 560 5 0 0 0 - - -;
+#X obj 169 314 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text -3 560 next_state;
+#X obj 169 359 metro 100;
+#X msg 213 477 set_p \$1;
+#X floatatom 213 457 5 0 1 0 - - -;
+#X obj 226 502 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 226 523 toggle_regions \$1;
+#X floatatom 244 551 5 0 0 0 - - -;
+#X floatatom 262 576 5 0 0 0 - - -;
+#X obj 244 620 pack 1 1;
+#X obj 262 598 t b f;
+#X msg 244 643 set_region \$1 \$2;
+#X obj -229 485 ao;
+#X obj 34 14 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+;
+#X obj -203 278 prepend add_state;
+#X obj -61 695 dac~;
+#X obj 245 13 loadbang;
+#X obj 245 55 send frame_size_ms;
+#N canvas 956 327 450 300 ms_to_samps 0;
+#X obj 117 103 samplerate~;
+#X obj 46 27 r frame_size_ms;
+#X obj 46 108 / 1000;
+#X obj 46 134 *;
+#X obj 46 56 t f b;
+#X obj 46 175 outlet;
+#X floatatom 137 145 5 0 0 0 - - -;
+#X connect 0 0 3 1;
+#X connect 1 0 4 0;
+#X connect 2 0 3 0;
+#X connect 3 0 5 0;
+#X connect 3 0 6 0;
+#X connect 4 0 2 0;
+#X connect 4 1 0 0;
+#X restore -25 580 pd ms_to_samps;
+#X obj -40 610 *;
+#X obj -130 13 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj -130 32 openpanel;
+#X msg 197 433 set_lrs \$1;
+#X floatatom 197 412 5 0 0 0 - - -;
+#X obj -130 77 soundfiler;
+#X obj -130 97 table input 441000;
+#X msg -130 55 read -resize \$1 input;
+#X obj 125 358 s gen;
+#X msg 33 73 train 1 127 1;
+#X obj 34 34 s learn;
+#X obj -122 648 r~ in_audio;
+#X obj 220 334 r frame_size_ms;
+#X obj -191 403 r to_nav_ao;
+#X obj 169 687 s to_nav_ao;
+#X obj 33 97 s to_nav_ao;
+#X text 236 411 constrain according to LRS;
+#X text 249 455 continuity parameter;
+#X text 244 499 constrain to specific region;
+#X text 278 548 set region start frame;
+#X text 299 574 set region end frame;
+#N canvas 493 387 363 214 capture_input 0;
+#X obj 26 143 tabwrite~ audio;
+#X obj 26 49 sel 0 1;
+#X msg 26 69 stop;
+#X obj 26 27 r learn;
+#X text 80 27 capture current audio input for later lookup;
+#X obj 109 61 inlet~;
+#X connect 1 0 2 0;
+#X connect 1 1 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 1 0;
+#X connect 5 0 0 0;
+#X restore -86 224 pd capture_input;
+#N canvas 659 421 450 300 make_new_state 0;
+#X obj 27 40 metro 100;
+#X floatatom 89 196 5 0 0 0 - - -;
+#X obj 50 147 sigmund~ 1024;
+#X obj 27 218 f;
+#X obj 50 174 moses 0;
+#X obj 78 17 r frame_size_ms;
+#X obj 27 17 r learn;
+#X text 103 115 make new states from current audio input;
+#X obj 27 243 outlet;
+#X obj 50 117 inlet~;
+#X connect 0 0 3 0;
+#X connect 1 0 3 1;
+#X connect 2 0 4 0;
+#X connect 3 0 8 0;
+#X connect 4 1 1 0;
+#X connect 5 0 0 1;
+#X connect 6 0 0 0;
+#X connect 9 0 2 0;
+#X restore -203 224 pd make_new_state;
+#X floatatom -203 251 5 0 0 0 - - -;
+#X msg 245 34 50;
+#X obj -203 173 tabplay~ input;
+#X obj -203 133 sel 0 1;
+#X msg -203 153 stop;
+#X obj -203 111 r learn;
+#X obj 244 79 table audio 4.41e+07;
+#X obj 26 224 s~ in_audio;
+#X text -194 600 # of oracle states;
+#X text -107 172 this can also be an adc~;
+#X text -196 73 4 reinit;
+#X text -109 11 1 open soundfile;
+#X text 55 11 2 learn oracle;
+#X text 32 53 3 find ideal distance threshold;
+#X text 276 32 6 frame size;
+#X text 189 311 5;
+#X obj -40 647 make_crossfade_audio audio;
+#X text 441 37 this subpatch demonstrates the use of ao in audio recombination.
+input audio (from a soundfile in this example) is analyzed and feature
+frames are added to the oracle. the input audio is also captured. the
+frame size (in ms) can be controlled with 6).;
+#X text 451 306 the continuity parameter \, "p" \, controls the likelihood
+of a recombination occuring. lower values of p produce more jumps/recombinations
+of the original audio.;
+#X text 466 369 the LRS parameter controls the length of shared context
+which must be present between two states for a jump to occur - in effect
+\, controlling the "smoothness" of a jump. higher values produce smoother
+jumps \, but also limit the number of possible jump points.;
+#X text 483 458 it is also possible to limit oracle navigation to only
+specific regions \, designated by frame indices. by setting a region
+start frame and end frame \, and then toggling regions "on" \, it is
+possible to limit generation to use only specific contiguous regions
+of the input audio - this enables generation to be limited to only
+specific musical materials \, sections \, phrases \, etc.;
+#X text 441 10 generation of new audio with ao;
+#X text 441 112 to begin \, load a soundfile by clicking [1]. then
+\, click [2] to analyze a fragment of the input. capture 15 - 20 seconds.
+this audio will be used to train the ao distance threshold. after the
+audio is captured \, click the "train 1 127 1" message [3]. since our
+feature extractor (in the "pd make_new_state" subpatcher) reports pitch
+in MIDI values \, our threshold range spans the appropriate values
+as well. after the threshold is determined \, it is important to click
+[4] to reset the oracle.;
+#X text 442 235 now \, click [2] to begin analyzing the input again.
+at any point after this \, click [5] to begin navigation/generation
+of new audio. the controls below [5] allow for various aspects of the
+generation to be modified.;
+#X connect 0 0 17 0;
+#X connect 2 0 38 0;
+#X connect 3 0 0 0;
+#X connect 4 0 24 0;
+#X connect 5 0 7 0;
+#X connect 5 0 32 0;
+#X connect 7 0 2 0;
+#X connect 8 0 38 0;
+#X connect 9 0 8 0;
+#X connect 10 0 11 0;
+#X connect 11 0 38 0;
+#X connect 12 0 14 0;
+#X connect 13 0 15 0;
+#X connect 14 0 16 0;
+#X connect 15 0 14 0;
+#X connect 15 1 14 1;
+#X connect 16 0 38 0;
+#X connect 17 0 1 0;
+#X connect 17 1 4 0;
+#X connect 18 0 34 0;
+#X connect 19 0 17 0;
+#X connect 21 0 48 0;
+#X connect 23 0 24 1;
+#X connect 24 0 63 0;
+#X connect 25 0 26 0;
+#X connect 26 0 31 0;
+#X connect 27 0 38 0;
+#X connect 28 0 27 0;
+#X connect 31 0 29 0;
+#X connect 33 0 39 0;
+#X connect 35 0 20 0;
+#X connect 36 0 7 1;
+#X connect 37 0 17 0;
+#X connect 46 0 47 0;
+#X connect 47 0 19 0;
+#X connect 48 0 22 0;
+#X connect 49 0 46 0;
+#X connect 49 0 45 0;
+#X connect 49 0 54 0;
+#X connect 50 0 51 0;
+#X connect 50 1 49 0;
+#X connect 51 0 49 0;
+#X connect 52 0 50 0;
+#X connect 63 0 20 1;
+#X restore -286 76 pd navigation;
+#X text 13 -5 reinitialize oracle;
+#X msg 16 53 train 0.001 1 0.01;
+#X text 138 52 find ideal oracle distance threshold;
+#X text 161 113 save oracle to file;
+#X msg 48 113 save filename.txt;
+#X msg 62 137 load filename.txt;
+#X text 174 137 load oracle to file;
+#X msg -4 27 add_state 0.5 1 0.3 0.7;
+#X text 147 163 print suffixes to console;
+#X text 159 189 print transitions to console;
+#X text 180 216 print reverse suffixes to console;
+#X text 190 246 print LRS vector to console;
+#X text 181 275 output music information rate (ir) for signal;
+#X obj 25 535 print IR;
+#X text 80 534 list of IR values at each state;
+#X text 213 302 navigate one step of recombination of original sequence
+;
+#X msg 163 334 set_p 0.5;
+#X text 229 333 change continuity parameter (lower vales = more jumps)
+;
+#X msg 178 363 toggle_regions 0;
+#X text 145 28 add a new analysis frame to oracle;
+#X text 288 362 toggle region constraint;
+#X msg 193 389 set_region 1 100;
+#X text 303 389 set region boundaries;
+#X msg 34 83 set_t 0.5;
+#X text 104 82 manually set distance threshold;
+#X msg 206 415 set_n 50;
+#X text 267 413 set oracle navigation pointer to specific state;
+#X msg 220 441 set_lrs 5;
+#X text 289 439 set minimum LRS (context) constraint;
+#X text -290 31 TUTORIAL AND EXAMPLE PATCHES;
+#X text -289 -9 ao - audio oracle in pure data/max;
+#X text -288 5 v1 2014 - greg surges surgesg@gmail.com;
+#N canvas 354 243 989 552 ir 0;
+#X floatatom -110 500 5 0 0 0 - - -;
+#X text -75 498 number of oracle states;
+#X obj -110 378 ao;
+#X obj 105 124 mfcc~ 1024 100;
+#X obj 203 85 metro 100;
+#X obj 105 8 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+;
+#X obj -110 131 loadbang;
+#X msg -110 153 init;
+#X obj 105 271 prepend add_state;
+#N canvas 0 22 450 278 (subpatch) 0;
+#X array arrayir 1362 float 0;
+#X coords 0 10 1361 0 360 220 1 0 0;
+#X restore 459 305 graph;
+#X msg -37 276 get_ir;
+#X obj -37 232 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj -112 4 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj -112 23 openpanel;
+#X obj -112 68 soundfiler;
+#X text -91 2 1 open soundfile;
+#X obj -28 66 table input2 441000;
+#X msg -112 46 read -resize \$1 input2;
+#X obj 105 45 sel 0 1;
+#X msg 105 65 stop;
+#X text 234 60 comment;
+#X obj 71 124 dac~;
+#X obj 105 85 tabplay~ input2;
+#X msg 105 308 train 0.1 1 0.1;
+#N canvas 751 342 450 300 ir_to_array 0;
+#X obj -14 13 inlet;
+#X obj -14 118 zl group 1;
+#X obj 142 105 zl len;
+#X obj -14 154 t f b;
+#X msg 142 129 \; arrayir resize \$1;
+#X obj -14 247 tabwrite arrayir;
+#X text 30 12 format IR list and write to array;
+#X obj -14 46 t a b a;
+#X msg 94 148 0;
+#X obj 79 192 int;
+#X obj 105 192 + 1;
+#X connect 0 0 7 0;
+#X connect 1 0 3 0;
+#X connect 2 0 4 0;
+#X connect 3 0 5 0;
+#X connect 3 1 9 0;
+#X connect 7 0 1 0;
+#X connect 7 1 8 0;
+#X connect 7 2 2 0;
+#X connect 8 0 9 1;
+#X connect 9 0 10 0;
+#X connect 9 0 5 1;
+#X connect 10 0 9 1;
+#X restore -80 404 pd ir_to_array;
+#X text 124 6 2 build oracle;
+#X text -75 151 4 reinit oracle;
+#X text -14 229 5 graph ir;
+#X text 455 25 [mfcc~] requires timbreID library: http://williambrent.conflations.com/pages/research.html
+;
+#X text 455 2 graphing the IR of a signal;
+#X obj 218 123 sigmund~ 1024;
+#X obj 242 241 spigot;
+#X obj 105 241 spigot 1;
+#X obj 275 220 == 0;
+#X obj 203 154 f;
+#X obj 275 192 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 203 172 moses 0;
+#X text 295 190 0 - mfcc / 1 - pitch;
+#X text 206 306 3a learn threshold (mfcc);
+#X msg 105 330 train 1 127 1;
+#X text 206 328 3b learn threshold (pitch);
+#X obj 275 151 loadbang;
+#X msg 275 172 1;
+#X text 454 62 IR captures the balance between novelty and familiarity
+in a sequence. blocks in the IR function indicate repetitions \, and
+valleys indicate moments of novelty. it is possible to retrieve the
+IR function for the analyzed signal. this subpatch demonstrates how
+to calculate and graph the IR as the spectral envelope or pitch of
+a signal is analyzed. this subpatch initially analyzes pitch \, but
+there is a toggle to switch to spectral envelope.;
+#X obj -37 254 metro 1000;
+#X text 455 174 first \, load a soundfile by clicking [1]. then \,
+train the oracle on a brief fragment of the file. capture 15-20 seconds
+of audio with [2] \, then train the oracle threshold with [3]. after
+the threshold is determined \, reset the oracle with [4]. start to
+rebuild the oracle with the correct threshold [2] \, and then click
+[5] to see the IR of the sequence in real-time. note: this is computationally
+intensive for long sequences....;
+#X connect 2 0 0 0;
+#X connect 2 3 24 0;
+#X connect 3 0 32 0;
+#X connect 4 0 3 0;
+#X connect 4 0 34 0;
+#X connect 5 0 4 0;
+#X connect 5 0 18 0;
+#X connect 6 0 7 0;
+#X connect 7 0 2 0;
+#X connect 8 0 2 0;
+#X connect 10 0 2 0;
+#X connect 11 0 44 0;
+#X connect 12 0 13 0;
+#X connect 13 0 17 0;
+#X connect 17 0 14 0;
+#X connect 18 0 19 0;
+#X connect 18 1 22 0;
+#X connect 19 0 22 0;
+#X connect 22 0 3 0;
+#X connect 22 0 30 0;
+#X connect 23 0 2 0;
+#X connect 30 0 34 1;
+#X connect 31 0 8 0;
+#X connect 32 0 8 0;
+#X connect 33 0 31 1;
+#X connect 34 0 36 0;
+#X connect 35 0 32 1;
+#X connect 35 0 33 0;
+#X connect 36 1 31 0;
+#X connect 39 0 2 0;
+#X connect 41 0 42 0;
+#X connect 42 0 35 0;
+#X connect 44 0 10 0;
+#X restore -286 97 pd ir;
+#N canvas 299 149 1268 803 query 1;
+#X msg 21 74 init;
+#X floatatom 21 600 5 0 0 0 - - -;
+#X msg 419 388 next_state;
+#X obj 21 16 loadbang;
+#X floatatom 210 560 5 0 0 0 - - -;
+#X obj 419 314 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 247 560 next_state;
+#X obj 419 359 metro 100;
+#X msg 463 477 set_p \$1;
+#X floatatom 463 457 5 0 1 0 - - -;
+#X obj 476 502 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 476 523 toggle_regions \$1;
+#X floatatom 494 551 5 0 0 0 - - -;
+#X floatatom 512 576 5 0 0 0 - - -;
+#X obj 494 620 pack 1 1;
+#X obj 512 598 t b f;
+#X msg 494 643 set_region \$1 \$2;
+#X obj 21 485 ao;
+#X obj 284 14 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 47 278 prepend add_state;
+#X obj 189 695 dac~;
+#X obj 495 13 loadbang;
+#X obj 495 55 send frame_size_ms;
+#N canvas 952 329 450 300 ms_to_samps 0;
+#X obj 117 103 samplerate~;
+#X obj 46 27 r frame_size_ms;
+#X obj 46 108 / 1000;
+#X obj 46 134 *;
+#X obj 46 56 t f b;
+#X obj 46 175 outlet;
+#X floatatom 137 145 5 0 0 0 - - -;
+#X connect 0 0 3 1;
+#X connect 1 0 4 0;
+#X connect 2 0 3 0;
+#X connect 3 0 5 0;
+#X connect 3 0 6 0;
+#X connect 4 0 2 0;
+#X connect 4 1 0 0;
+#X restore 225 580 pd ms_to_samps;
+#X obj 210 610 *;
+#X obj 120 13 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 120 32 openpanel;
+#X msg 447 433 set_lrs \$1;
+#X floatatom 447 412 5 0 0 0 - - -;
+#X obj 120 77 soundfiler;
+#X obj 375 358 s gen;
+#X msg 283 73 train 1 127 1;
+#X obj 470 334 r frame_size_ms;
+#X text 486 411 constrain according to LRS;
+#X text 499 455 continuity parameter;
+#X text 494 499 constrain to specific region;
+#X text 528 548 set region start frame;
+#X text 549 574 set region end frame;
+#N canvas 485 399 363 214 capture_input 0;
+#X obj 26 49 sel 0 1;
+#X msg 26 69 stop;
+#X text 80 27 capture current audio input for later lookup;
+#X obj 109 61 inlet~;
+#X obj 26 143 tabwrite~ audio3;
+#X obj 26 27 r learnq;
+#X connect 0 0 1 0;
+#X connect 0 1 4 0;
+#X connect 1 0 4 0;
+#X connect 3 0 4 0;
+#X connect 5 0 0 0;
+#X restore 164 224 pd capture_input;
+#N canvas 653 428 450 300 make_new_state 0;
+#X obj 27 40 metro 100;
+#X floatatom 89 196 5 0 0 0 - - -;
+#X obj 50 147 sigmund~ 1024;
+#X obj 27 218 f;
+#X obj 50 174 moses 0;
+#X obj 78 17 r frame_size_ms;
+#X text 103 115 make new states from current audio input;
+#X obj 27 243 outlet;
+#X obj 50 117 inlet~;
+#X obj 27 17 r learnq;
+#X connect 0 0 3 0;
+#X connect 1 0 3 1;
+#X connect 2 0 4 0;
+#X connect 3 0 7 0;
+#X connect 4 1 1 0;
+#X connect 5 0 0 1;
+#X connect 8 0 2 0;
+#X connect 9 0 0 0;
+#X restore 47 224 pd make_new_state;
+#X floatatom 47 251 5 0 0 0 - - -;
+#X msg 495 34 50;
+#X obj 47 133 sel 0 1;
+#X msg 47 153 stop;
+#X text 56 600 # of oracle states;
+#X text 143 172 this can also be an adc~;
+#X text 54 73 4 reinit;
+#X text 141 11 1 open soundfile;
+#X text 305 11 2 learn oracle;
+#X text 282 53 3 find ideal distance threshold;
+#X text 526 32 6 frame size;
+#X text 439 311 5;
+#X obj 673 14 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 673 33 openpanel;
+#X obj 673 78 soundfiler;
+#X text 694 12 1 open soundfile;
+#X obj 673 98 table query 441000;
+#X msg 673 56 read -resize \$1 query;
+#N canvas 649 426 450 300 make_new_state 0;
+#X obj 27 40 metro 100;
+#X floatatom 89 196 5 0 0 0 - - -;
+#X obj 50 147 sigmund~ 1024;
+#X obj 27 218 f;
+#X obj 50 174 moses 0;
+#X obj 78 17 r frame_size_ms;
+#X text 103 115 make new states from current audio input;
+#X obj 27 243 outlet;
+#X obj 50 117 inlet~;
+#X obj 27 17 r query;
+#X connect 0 0 3 0;
+#X connect 1 0 3 1;
+#X connect 2 0 4 0;
+#X connect 3 0 7 0;
+#X connect 4 1 1 0;
+#X connect 5 0 0 1;
+#X connect 8 0 2 0;
+#X connect 9 0 0 0;
+#X restore 865 136 pd make_new_state;
+#X floatatom 865 163 5 0 0 0 - - -;
+#X msg 865 65 stop;
+#X obj 863 24 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 865 46 sel 0 1;
+#X obj 865 85 tabplay~ query;
+#X obj 977 59 s gen;
+#X obj 865 231 prepend query;
+#X obj 850 199 f;
+#X obj 739 173 metro 100;
+#X obj 759 141 r frame_size_ms;
+#X obj 251 464 print;
+#X obj 1028 56 s query;
+#X obj 276 224 s~ in_audio_q;
+#X obj 117 648 r~ in_audio_q;
+#X obj 494 79 table audio3 4.41e+07;
+#X obj 210 647 make_crossfade_audio audio3;
+#X obj 284 34 s learnq;
+#X obj 47 111 r learnq;
+#X obj 283 97 s to_query_ao;
+#X obj 59 403 r to_query_ao;
+#X obj 419 687 s to_query_ao;
+#X obj 120 97 table input3 441000;
+#X msg 120 55 read -resize \$1 input3;
+#X obj 47 173 tabplay~ input3;
+#X msg 734 546 set_query_thresh \$1;
+#X floatatom 735 517 5 0 0 0 - - -;
+#X obj 108 688 r~ query_in;
+#X obj 959 107 s~ query_in;
+#X connect 0 0 17 0;
+#X connect 2 0 79 0;
+#X connect 3 0 0 0;
+#X connect 4 0 24 0;
+#X connect 5 0 7 0;
+#X connect 5 0 30 0;
+#X connect 7 0 2 0;
+#X connect 8 0 79 0;
+#X connect 9 0 8 0;
+#X connect 10 0 11 0;
+#X connect 11 0 79 0;
+#X connect 12 0 14 0;
+#X connect 13 0 15 0;
+#X connect 14 0 16 0;
+#X connect 15 0 14 0;
+#X connect 15 1 14 1;
+#X connect 16 0 79 0;
+#X connect 17 0 1 0;
+#X connect 17 1 4 0;
+#X connect 18 0 75 0;
+#X connect 19 0 17 0;
+#X connect 21 0 41 0;
+#X connect 23 0 24 1;
+#X connect 24 0 74 0;
+#X connect 25 0 26 0;
+#X connect 26 0 81 0;
+#X connect 27 0 79 0;
+#X connect 28 0 27 0;
+#X connect 31 0 77 0;
+#X connect 32 0 7 1;
+#X connect 39 0 40 0;
+#X connect 40 0 19 0;
+#X connect 41 0 22 0;
+#X connect 42 0 43 0;
+#X connect 42 1 82 0;
+#X connect 43 0 82 0;
+#X connect 52 0 53 0;
+#X connect 53 0 57 0;
+#X connect 57 0 54 0;
+#X connect 58 0 59 0;
+#X connect 59 0 66 1;
+#X connect 60 0 63 0;
+#X connect 61 0 62 0;
+#X connect 61 0 64 0;
+#X connect 61 0 67 0;
+#X connect 61 0 70 0;
+#X connect 62 0 60 0;
+#X connect 62 1 63 0;
+#X connect 63 0 58 0;
+#X connect 63 0 86 0;
+#X connect 65 0 79 0;
+#X connect 66 0 65 0;
+#X connect 67 0 66 0;
+#X connect 68 0 67 1;
+#X connect 72 0 20 0;
+#X connect 74 0 20 1;
+#X connect 76 0 42 0;
+#X connect 78 0 17 0;
+#X connect 81 0 29 0;
+#X connect 82 0 39 0;
+#X connect 82 0 38 0;
+#X connect 82 0 71 0;
+#X connect 83 0 79 0;
+#X connect 84 0 83 0;
+#X connect 85 0 20 0;
+#X restore -286 118 pd query;
+#X connect 0 0 12 0;
+#X connect 1 0 12 0;
+#X connect 2 0 12 0;
+#X connect 4 0 12 0;
+#X connect 10 0 12 0;
+#X connect 11 0 12 0;
+#X connect 12 0 3 0;
+#X connect 12 1 5 0;
+#X connect 12 2 7 0;
+#X connect 12 3 29 0;
+#X connect 13 0 12 0;
+#X connect 17 0 12 0;
+#X connect 20 0 12 0;
+#X connect 21 0 12 0;
+#X connect 23 0 12 0;
+#X connect 32 0 12 0;
+#X connect 34 0 12 0;
+#X connect 37 0 12 0;
+#X connect 39 0 12 0;
+#X connect 41 0 12 0;
+#X connect 43 0 12 0;

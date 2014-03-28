@@ -1,0 +1,157 @@
+#N canvas 335 22 891 647 10;
+#X msg -43 -4 init;
+#X msg 31 105 print_sfx;
+#X msg 44 131 print_trn;
+#X floatatom -43 562 5 0 0 0 - - -;
+#X msg 91 245 next_state;
+#X floatatom -28 538 5 0 0 0 - - -;
+#X text 9 538 next_state;
+#X floatatom -11 512 5 0 0 0 - - -;
+#X text -8 560 number of oracle states;
+#X text 24 511 value at next state;
+#X msg 83 215 get_ir;
+#X msg 71 188 print_lrs;
+#X msg 57 158 print_rsfx;
+#X text -7 -5 reinitialize oracle;
+#X text 111 53 save oracle to file;
+#X msg -2 53 save filename.txt;
+#X msg 12 77 load filename.txt;
+#X text 97 103 print suffixes to console;
+#X text 109 129 print transitions to console;
+#X text 130 156 print reverse suffixes to console;
+#X text 140 186 print LRS vector to console;
+#X obj 5 485 print IR;
+#X text 60 484 list of IR values at each state;
+#X text 163 242 navigate one step of recombination of original sequence
+;
+#X msg 113 274 set_p 0.5;
+#X msg 128 303 toggle_regions 0;
+#X text 125 28 add a new analysis frame to oracle;
+#X text 238 302 toggle region constraint;
+#X msg 143 329 set_region 1 100;
+#X text 253 329 set region boundaries;
+#X msg 156 355 set_n 50;
+#X text 217 353 set oracle navigation pointer to specific state;
+#X msg 170 381 set_lrs 5;
+#X text 239 379 set minimum LRS (context) constraint;
+#X text -288 5 v1 2014 - greg surges surgesg@gmail.com;
+#X msg -24 27 add_state 50;
+#X text -289 -9 fo - factor oracle in pure data/max;
+#X obj -43 437 fo;
+#N canvas 79 239 1146 659 example_usage 0;
+#X msg 21 74 init;
+#X floatatom 21 600 5 0 0 0 - - -;
+#X msg 319 208 next_state;
+#X obj 21 16 loadbang;
+#X floatatom 50 560 5 0 0 0 - - -;
+#X obj 319 134 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 87 560 next_state;
+#X obj 319 179 metro 100;
+#X msg 363 297 set_p \$1;
+#X floatatom 363 277 5 0 1 0 - - -;
+#X obj 376 322 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 376 343 toggle_regions \$1;
+#X floatatom 394 371 5 0 0 0 - - -;
+#X floatatom 412 396 5 0 0 0 - - -;
+#X obj 394 440 pack 1 1;
+#X obj 412 418 t b f;
+#X msg 394 463 set_region \$1 \$2;
+#X obj 47 278 prepend add_state;
+#X msg 347 253 set_lrs \$1;
+#X floatatom 347 232 5 0 0 0 - - -;
+#X obj 59 403 r to_nav_ao;
+#X obj 319 507 s to_nav_ao;
+#X text 386 231 constrain according to LRS;
+#X text 399 275 continuity parameter;
+#X text 394 319 constrain to specific region;
+#X text 428 368 set region start frame;
+#X text 449 394 set region end frame;
+#X floatatom 47 251 5 0 0 0 - - -;
+#X text 56 600 # of oracle states;
+#X text 674 207 the continuity parameter \, "p" \, controls the likelihood
+of a recombination occuring. lower values of p produce more jumps/recombinations
+of the original audio.;
+#X text 689 270 the LRS parameter controls the length of shared context
+which must be present between two states for a jump to occur - in effect
+\, controlling the "smoothness" of a jump. higher values produce smoother
+jumps \, but also limit the number of possible jump points.;
+#X text 706 359 it is also possible to limit oracle navigation to only
+specific regions \, designated by frame indices. by setting a region
+start frame and end frame \, and then toggling regions "on" \, it is
+possible to limit generation to use only specific contiguous regions
+of the input audio - this enables generation to be limited to only
+specific musical materials \, sections \, phrases \, etc.;
+#X obj 21 485 fo;
+#X obj 47 116 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 47 145 metro 50;
+#X obj 47 183 random 127;
+#X floatatom 90 525 5 0 0 0 - - -;
+#X text 127 525 data at next state;
+#X text 55 73 initialize oracle;
+#X text 72 113 begin building oracle;
+#X text 116 183 ints only;
+#X text 341 133 begin generating new sequence;
+#X text 660 6 generation of new sequence with fo;
+#X text 660 33 this subpatch demonstrates the use of fo in sequence
+recombination. an input sequence is analyzed \, and each symbol becomes
+a frame in the oracle.;
+#X text 659 84 to begin \, click the toggle labeled "begin building
+oracle". this will begin to add states with symbols 0 - 127 to the
+oracle.;
+#X text 659 133 at any point after this \, click the second toggle
+(labeled "begin generating new sequence") to begin navigation/generation
+of a new sequence. the controls below allow for various aspects of
+the generation to be modified.;
+#X connect 0 0 32 0;
+#X connect 2 0 21 0;
+#X connect 3 0 0 0;
+#X connect 5 0 7 0;
+#X connect 7 0 2 0;
+#X connect 8 0 21 0;
+#X connect 9 0 8 0;
+#X connect 10 0 11 0;
+#X connect 11 0 21 0;
+#X connect 12 0 14 0;
+#X connect 13 0 15 0;
+#X connect 14 0 16 0;
+#X connect 15 0 14 0;
+#X connect 15 1 14 1;
+#X connect 16 0 21 0;
+#X connect 17 0 32 0;
+#X connect 18 0 21 0;
+#X connect 19 0 18 0;
+#X connect 20 0 32 0;
+#X connect 27 0 17 0;
+#X connect 32 0 1 0;
+#X connect 32 1 4 0;
+#X connect 32 2 36 0;
+#X connect 33 0 34 0;
+#X connect 34 0 35 0;
+#X connect 35 0 27 0;
+#X restore -286 46 pd example_usage;
+#X text 124 77 load oracle from file;
+#X text 131 215 output music information rate (ir) for sequence;
+#X text 179 273 change continuity parameter (lower values = more jumps)
+;
+#X connect 0 0 37 0;
+#X connect 1 0 37 0;
+#X connect 2 0 37 0;
+#X connect 4 0 37 0;
+#X connect 10 0 37 0;
+#X connect 11 0 37 0;
+#X connect 12 0 37 0;
+#X connect 15 0 37 0;
+#X connect 16 0 37 0;
+#X connect 24 0 37 0;
+#X connect 25 0 37 0;
+#X connect 28 0 37 0;
+#X connect 30 0 37 0;
+#X connect 32 0 37 0;
+#X connect 35 0 37 0;
+#X connect 37 0 3 0;
+#X connect 37 1 5 0;
+#X connect 37 2 7 0;
+#X connect 37 3 21 0;
