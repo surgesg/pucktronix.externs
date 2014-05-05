@@ -582,7 +582,14 @@ void ao::m_next_state(){
     }
     n = new_n;
     ToOutInt(1, new_n);
-    //ToOutInt(2, data[new_n]); // may want to add this in at some point
+    AtomList dataOut(data[new_n].size() + 1);
+    SetSymbol(dataOut[0], sym_list);
+    t_atom new_atom;
+    for(int i = 0; i < data[new_n].size(); i++){
+        SetFloat(new_atom, data[new_n][i]);
+        CopyAtom(&dataOut[i+1], &new_atom);
+    }
+    ToOutAnything(2, GetSymbol(dataOut[0]), data[new_n].size(), dataOut.Atoms()+1);// may want to add this in at some point
 }
 
 vector<int> ao::limit_to_region(vector<int> options, int n){
