@@ -1,0 +1,2 @@
+NAME=LMSspec~
+SRCS=main.cpp

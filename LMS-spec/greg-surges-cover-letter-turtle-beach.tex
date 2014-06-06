@@ -1,0 +1,129 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Long Lined Cover Letter
+% LaTeX Template
+% Version 1.0 (1/6/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Matthew J. Miller
+% http://www.matthewjmiller.net/howtos/customized-cover-letter-scripts/
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[10pt,stdletter,dateno,sigleft]{newlfm} % Extra options: 'sigleft' for a left-aligned signature, 'stdletternofrom' to remove the from address, 'letterpaper' for US letter paper - consult the newlfm class manual for more options
+
+\usepackage{charter} % Use the Charter font for the document text
+\usepackage{verbatim} % Use the Charter font for the document text
+
+\newsavebox{\Luiuc}\sbox{\Luiuc}{\parbox[b]{1.75in}{\vspace{0.5in}
+\includegraphics[width=1.2\linewidth]{logo.png}}} % Company/institution logo at the top left of the page
+\makeletterhead{Uiuc}{\Lheader{\usebox{\Luiuc}}}
+
+\newlfmP{sigsize=0pt} % Slightly decrease the height of the signature field
+\newlfmP{addrfromphone} % Print a phone number under the sender's address
+\newlfmP{addrfromemail} % Print an email address under the sender's address
+\PhrPhone{Phone} % Customize the "Telephone" text
+\PhrEmail{Email} % Customize the "E-mail" text
+
+%\lthUiuc % Print the company/institution logo
+
+%----------------------------------------------------------------------------------------
+%	YOUR NAME AND CONTACT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\namefrom{Greg Surges} % Name
+
+\addrfrom{
+\today\\[12pt] % Date
+4165 Monroe Avenue \\ % Address
+Apartment 5 \\
+San Diego, CA 92116 
+}
+
+\phonefrom{(414) 412-5303} % Phone number
+
+\emailfrom{surgesg@gmail.com} % Email address
+
+%----------------------------------------------------------------------------------------
+%	ADDRESSEE AND GREETING/CLOSING
+%----------------------------------------------------------------------------------------
+
+\greetto{Dear Mrs. Smith,} % Greeting text
+\closeline{Sincerely yours,} % Closing text
+
+\nameto{Mrs. Jane Smith} % Addressee of the letter above the to address
+
+\addrto{
+Recruitment Officer \\ % To address
+The Corporation \\
+123 Pleasant Lane \\
+City, State 12345
+}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+\begin{newlfm}
+
+%----------------------------------------------------------------------------------------
+%	LETTER CONTENT
+%----------------------------------------------------------------------------------------
+
+    I'm writing to apply for the (position)} at {\bf company}. 
+    I am an audio programmer and musician, with experience 
+    in both technical and creative areas. 
+    My current work involves developing computer software to generate, analyze, and understand
+    music and musical structure.
+    I am able to combine a strong analytical approach to problem-solving with
+    a sense of aesthetics and subjective quality developed through my musical training.
+    
+    My professional experience and skill-set are varied, and include:
+    \begin{itemize}
+        \item Programming software and designing hardware for 3 unique electronic 
+            music hardware / software devices.
+            As the sole proprietor of my own startup company, I successfully
+            created and launched these products, 
+            including a successful funding campaign on Kickstarter. 
+        \item Working as software developer for a variety of creative and research
+            projects, including large-scale art installations, the development of 
+            novel digital signal processing effects for electronic music production,
+            and music software for generative composition and machine musical 
+            improvisation.
+            I have experience working on teams comprised of researchers and artists
+            across multiple disciplines, and enjoy interfacing with people from a 
+            variety of backgrounds.
+        \item
+            I am experienced using C/C++, Python, Processing, Max/MSP, Pure Data, and
+            with developing VST plugins, external objects for Max/MSP and Pure Data,
+            and standalone desktop applications using \\ PortAudio for real-time audio.
+        %\begin{comment}
+        \item Teaching various music and technology topics at the undergraduate level. 
+            These courses include ``Introduction to Computers and Music,'' 
+            ``American Experimental Music,'' and ``Music Theory Fundamentals.'' 
+        %\end{comment}
+        \item Published research on signal-processing effects, open-source music
+            hardware design, generative music, and networked computer music performance.
+            I have been published by Springer, the American Association for
+            Artificial Intelligence, the International Computer Music Conference, and
+            the Stockholm Musical Acoustics Conference / Sound and Music Computing Conference,
+            and have presented my work both across the U.S. and internationally.
+    \end{itemize}
+
+    I am eager to speak with you at your earliest convenience concerning the
+    {\bf position}. Please find my current resume attached. 
+    I may be reached at (414)-412-5303 or at surgesg@gmail.com.
+    Thank you in advance for your consideration.
+
+%----------------------------------------------------------------------------------------
+
+\end{newlfm}
+\end{document}
