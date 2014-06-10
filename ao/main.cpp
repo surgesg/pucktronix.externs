@@ -191,6 +191,7 @@ void ao::m_init(){
     // initialize oracle and parameters
     _init_oracle();
     data.clear();
+    data.reserve(2000);
     data.push_back(vector<float>(0));
 
     p = 0.5;
@@ -205,19 +206,23 @@ void ao::m_init(){
 void ao::_init_oracle(){
     // initialize oracle data structures (except data vec)
     sfx.clear();
+    sfx.reserve(2000);
     sfx.push_back(-1);
 
     vector1D temp;
     // temp.push_back(0);
     trn.clear();
+    trn.reserve(2000);
     trn.push_back(temp);
 
     vector1D temp2;
     // temp2.push_back(0);
     rsfx.clear();
+    rsfx.reserve(2000);
     rsfx.push_back(temp2);
 
     lrs.clear();
+    lrs.reserve(2000);
     lrs.push_back(0);
     
     n_states = 1; // including state 0?
