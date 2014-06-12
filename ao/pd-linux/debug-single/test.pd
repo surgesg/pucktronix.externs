@@ -1,4 +1,4 @@
-#N canvas 172 22 959 691 10;
+#N canvas 398 335 959 691 10;
 #X msg -23 -4 init;
 #X msg 81 165 print_sfx;
 #X msg 94 191 print_trn;
@@ -68,7 +68,7 @@ this ideal threshold.;
 #X connect 14 0 6 0;
 #X connect 15 0 6 0;
 #X restore -286 54 pd training;
-#N canvas 223 88 1180 739 navigation 0;
+#N canvas 220 93 1180 739 navigation 1;
 #X msg -229 74 init;
 #X floatatom -229 600 5 0 0 0 - - -;
 #X msg 169 388 next_state;
@@ -213,6 +213,8 @@ as well. after the threshold is determined \, it is important to click
 at any point after this \, click [5] to begin navigation/generation
 of new audio. the controls below [5] allow for various aspects of the
 generation to be modified.;
+#X msg -162 436 save /home/ptnx/Documents/code/pd-externs/text2.txt
+;
 #X connect 0 0 17 0;
 #X connect 2 0 38 0;
 #X connect 3 0 0 0;
@@ -257,6 +259,7 @@ generation to be modified.;
 #X connect 51 0 49 0;
 #X connect 52 0 50 0;
 #X connect 63 0 20 1;
+#X connect 71 0 17 0;
 #X restore -286 76 pd navigation;
 #X text 13 -5 reinitialize oracle;
 #X msg 16 53 train 0.001 1 0.01;

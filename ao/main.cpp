@@ -485,6 +485,10 @@ void ao::m_query(int argc, t_atom *argv){
                 intersection.push_back(connected_states[i]);
             }    
         }
+        if(regions_active){
+            // remove states outside region
+            intersection = limit_to_region(intersection, n);
+        }
         // choose closest matching state (maybe revise this?)
         int nearest_index;
         float nearest_distance = 100000;
@@ -901,6 +905,7 @@ void ao::m_save(t_symbol *s){
     post("saving...");
     ofstream file;
     file.open(fname.c_str());
+    post(fname.c_str());
     // first line contains length of oracle
     file << n_states << endl;
     // then suffixes
