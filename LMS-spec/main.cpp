@@ -5,6 +5,7 @@
 // http://iem.kug.ac.at/pd/externals-HOWTO/
 
 #include <flext.h>
+#include <stdlib.h>
  
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)
 #error You need at least flext version 0.4.1
@@ -28,41 +29,55 @@ class LMSspec:
 	FLEXT_HEADER(LMSspec, flext_dsp)
 
 	public:
-		LMSspec():
-			f_pan(0) // initialize f_pan
+		LMSspec(int argc, t_atom *argv)
 		{
-			// The constructor of your class is responsible for
-			// setting up inlets and outlets and for registering
-			// inlet-methods:
-			// The descriptions of the inlets and outlets are output
-			// via the Max/MSP assist method (when mousing over them in edit mode).
-			// PD will hopefully provide such a feature as well soon
+            // arguments [LMSspec~ u L]
+            // or just [LMSspec~ u] 
 
-			AddInSignal("left audio in");       // left audio in
-			AddInSignal("right audio in");      // right audio in
-			AddInAnything("panning parameter");    // 1 float in
+			AddInSignal("filter audio in");       // left audio in
+			AddInSignal("source audio in");      // right audio in
+			AddInAnything("messages");    // 1 float in
 			AddOutSignal("audio out");          // 1 audio out 
-			AddOutAnything("audio out");          // 1 audio out 
+			AddOutSignal("audio out");          // 1 audio out 
+			AddOutAnything("data out");          // 1 audio out 
 			
 			// Now we need to bind the handler function to our
 			// panning inlet, which is inlet 2 (counting all inlets
 			// from 0).  We want the function "setPan" to get
 			// called on incoming float messages:
 
-			FLEXT_ADDMETHOD(2,setPan);
 			FLEXT_ADDMETHOD_(2, "printw", m_printw);
-            L = 32;
-            A = 1.0;
-            a = 0.95;
-            r0 = ((A*A)/2.0) + var;
-            var = 0.01;
-            u = a / (r0*L);
-            w = new float[L];
-            taps = new float[L];
-            y = new float[L];
+			FLEXT_ADDMETHOD_(2, "init", m_init);
+            L = 16;
+            u = 0.01;// a / (r0*L);
+
+            switch(argc){
+                case 2:
+                    L = GetInt(argv[1]);
+                    u = GetFloat(argv[0]);
+                case 1:
+                    u = GetFloat(argv[0]);
+                case 0:
+                    ;
+            }
+
+            w = new double[L];
+            taps = new double[L];
+            y = new double[L];
+            for(int i = 0; i < L; i++){
+                w[i] = taps[i] = y[i] = 0.f;
+            }
+
+            src_taps = new double[L];
+            src_w = new double[L+1];
+            for(int i = 0; i < L; i++){
+                src_taps[i] = src_w[i] = 0.f;
+            }
+            src_w[L] = 0.f;
 		
 			// We're done constructing:
-			post("-- pan~ with flext ---");
+			post("-- LMSspec~ -- \n 2014 greg surges \n surgesg@gmail.com");
+            post("L: %d, u: %f", L, u);
 			
 		} // end of constructor
 		
@@ -71,17 +86,17 @@ class LMSspec:
 		// here we declare the virtual DSP function
 		virtual void m_signal(int n, float *const *in, float *const *out);
         void m_printw();
+        void m_init();
+        ~LMSspec(); // destructor
 	private:	
-		float f_pan;    // holds our panning factor
-	    float A;
-        float a;
-        float r0;
         float u;        // learning rate
         int L;          // num taps
-        float var;      // signal variance
-        float *w;       // weight vector
-        float *taps;    // delay line
-        float *y;       // filter state
+        double *w;       // weight vector
+        double *taps;    // delay line
+        double *y;       // filter state
+
+        double *src_taps;
+        double *src_w;
         
 		// Before we can use "setPan" as a handler, we must register this
 		// function as a callback to PD or Max. This is done using the
@@ -91,20 +106,9 @@ class LMSspec:
 		// expecting one float arg (thus ending in "_F"). There are
 		// other shortcuts that register other types of functions. Look
 		// into flext.h. No semicolon at the end of line!!!
-		FLEXT_CALLBACK_F(setPan)
 		FLEXT_CALLBACK(m_printw)
+		FLEXT_CALLBACK(m_init)
 
-		// Now setPan can get declared and defined here.
-		void setPan(float f) 
-		{ 
-			// set our private panning factor "f_pan" to the inlet
-			// value float "f" in the intervall [0,1]
-			f_pan = (f<0) ? 0.0f : (f>1) ? 1.0f : f ;	
-			
-			// if you want to debug if this worked, comment out the
-			// following line: 
-			//post("Set panning to %.2f, maybe clipped from %.2f", f_pan,f);
-		} // end setPan
 }; // end of class declaration for LMS-spec
 
 
@@ -113,7 +117,7 @@ class LMSspec:
 // that be for?  Registering is made easy with the FLEXT_NEW_* macros defined
 // in flext.h. For tilde objects without arguments call:
 
-FLEXT_NEW_DSP("LMSspec~ LMSspec", LMSspec)
+FLEXT_NEW_DSP_V("LMSspec~ LMSspec", LMSspec)
 // T.Grill: there are two names for the object: LMS-spec~ as main name and pan~ as its alias
 
 // Now we define our DSP function. It gets this arguments:
@@ -123,42 +127,56 @@ FLEXT_NEW_DSP("LMSspec~ LMSspec", LMSspec)
 //          These are arrays of the signals in the objects signal inlets rsp.
 //          oulets. We come to that later inside the function.
 
+LMSspec::~LMSspec(){
+    delete[] w;
+    delete[] taps;
+    delete[] y;
+
+}
+
+void LMSspec::m_init(){
+    for(int i = 0; i < L; i++){
+        w[i] = taps[i] = y[i] = 0.f;
+    }
+}
+
 void LMSspec::m_printw(){
-    AtomList out(L+1);
+    // this outputs coefficients for 
+    // instantaneous spectral estimate
+    AtomList out(L+2);
     SetSymbol(out[0], sym_list);
+    SetFloat(out[1], 1.0);
     t_atom new_atom;
     for(int i = 0; i < L; i++){
-        SetFloat(new_atom, w[i]);
-        CopyAtom(&out[i+1], &new_atom);
+        //post("%d: %f", i, w[i]);
+        SetFloat(new_atom, w[i]*-1);
+        CopyAtom(&out[i+2], &new_atom);
     }
-    ToOutAnything(1, GetSymbol(out[0]), L, out.Atoms()+1);
+    ToOutAnything(2, GetSymbol(out[0]), L+1, out.Atoms()+1);
 }
 
 void LMSspec::m_signal(int n, float *const *in, float *const *out)
 {
 	
-	const float *ins1    =  in[0];
-	const float *ins2    =  in[1];
+	//const float *ins1    =  in[0];
+	const float *ins1    =  InSig(0);
+	//const float *ins2    =  in[1];
+	const float *ins2    =  InSig(1);
 	// As said above "in" holds a list of the signal vectors in all inlets.
 	// After these two lines, ins1 holds the signal vector ofthe first
 	// inlet, index 0, and ins2 holds the signal vector of the second
 	// inlet, with index 1.
 	
-	float *outs          = out[0];
+	float *outs1          = OutSig(0);
+	float *outs2          = OutSig(1);
 	// Now outs holds the signal vector at the one signal outlet we have.
 	
 	// We are now ready for the main signal loop
 	while (n--)
 	{
-		
-		// The "++" after the pointers outs, ins1 and ins2 walks us
-		// through the signal vector with each n, of course. Before
-		// each step we change the signal value in the outlet *outs
-		// according to our panning factor "f_pan" and according to the
-		// signals at the two signal inlets, *ins1 and *ins2 
-        float dh = 0;   // estimate
-        float e = 0;    // error
-        float x = (*ins1++);
+        double dh = 0;   // estimate
+        double e = 0;    // error
+        double x = (*ins1++);
 
         // filter - dot product of weights and taps
         for(int i = 0; i < L; i++){
@@ -168,17 +186,50 @@ void LMSspec::m_signal(int n, float *const *in, float *const *out)
         e = x - dh;
 
         // update weights 
+        // seems like it might be working, but as the input changes,
+        // the spectral envelope doesn't change correctly
+        // i.e. if a single sinusoid is input, if it changes frequency
+        // the zero at the original freq will remain
+        // this causes the error signal to remain zero/small and therefore
+        // the false peak never adapts away
         float update[L];
+        float rand_term;
         for(int i = 0; i < L; i++){
+            //rand_term = (rand() % 10000) - 5000;
+            //rand_term = float(rand_term) / 100000000; // 0 - 0.001
             // this code can be simplified
-            update[i] = 2*u*e*taps[i];
-            w[i] = w[i] + update[i];
+            update[i] = 2.0*u*e*taps[i];
+            w[i] = w[i] + 2.0*u*e*taps[i]; // + rand_term;
         }
 	    // update delay line
         for(int i = L-1; i > 0; i--){
             taps[i] = taps[i-1];
         }
         taps[0] = x; 
-		//*outs++  = (*ins1++) * (1-f_pan) + (*ins2++) * f_pan;
+        // error sig
+		*outs1++  = e;
+
+        //**** begin source/filter method here *****************
+        double s = (*ins2++);
+        double src_filtered = 0;
+
+        // process zeros to poles / FIR to IIR
+        src_w[0] = 1;
+        for(int i = 0; i < L; i++){
+            src_w[i+1] = -w[i];
+        }
+        
+        src_filtered = -1 * s; // B
+        for(int i = 1; i < L+1; i++){ // As
+            src_filtered -= src_w[i] * src_taps[i]; 
+        }
+
+        for(int i = L; i > 0; i--){
+            src_taps[i] = src_taps[i-1];
+        }
+        src_taps[0] = src_filtered; 
+
+        *outs2++ = src_filtered;
+        //*outs2++ = s;
 	}
 }  // end m_signal
