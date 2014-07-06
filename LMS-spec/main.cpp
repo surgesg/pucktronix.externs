@@ -117,7 +117,7 @@ class LMSspec:
 // that be for?  Registering is made easy with the FLEXT_NEW_* macros defined
 // in flext.h. For tilde objects without arguments call:
 
-FLEXT_NEW_DSP_V("LMSspec~ LMSspec", LMSspec)
+FLEXT_NEW_DSP_V("LMSspec~ LMSspec~", LMSspec)
 // T.Grill: there are two names for the object: LMS-spec~ as main name and pan~ as its alias
 
 // Now we define our DSP function. It gets this arguments:
@@ -157,26 +157,19 @@ void LMSspec::m_printw(){
 
 void LMSspec::m_signal(int n, float *const *in, float *const *out)
 {
-	
-	//const float *ins1    =  in[0];
-	const float *ins1    =  InSig(0);
-	//const float *ins2    =  in[1];
-	const float *ins2    =  InSig(1);
-	// As said above "in" holds a list of the signal vectors in all inlets.
-	// After these two lines, ins1 holds the signal vector ofthe first
-	// inlet, index 0, and ins2 holds the signal vector of the second
-	// inlet, with index 1.
+	float *ins1    =  InSig(0);
+	float *ins2    =  InSig(1);
 	
 	float *outs1          = OutSig(0);
 	float *outs2          = OutSig(1);
-	// Now outs holds the signal vector at the one signal outlet we have.
+    int j = 0;
 	
-	// We are now ready for the main signal loop
 	while (n--)
 	{
         double dh = 0;   // estimate
         double e = 0;    // error
-        double x = (*ins1++);
+        double x = ins1[j];
+        double s = ins2[j];
 
         // filter - dot product of weights and taps
         for(int i = 0; i < L; i++){
@@ -192,13 +185,7 @@ void LMSspec::m_signal(int n, float *const *in, float *const *out)
         // the zero at the original freq will remain
         // this causes the error signal to remain zero/small and therefore
         // the false peak never adapts away
-        float update[L];
-        float rand_term;
         for(int i = 0; i < L; i++){
-            //rand_term = (rand() % 10000) - 5000;
-            //rand_term = float(rand_term) / 100000000; // 0 - 0.001
-            // this code can be simplified
-            update[i] = 2.0*u*e*taps[i];
             w[i] = w[i] + 2.0*u*e*taps[i]; // + rand_term;
         }
 	    // update delay line
@@ -207,29 +194,29 @@ void LMSspec::m_signal(int n, float *const *in, float *const *out)
         }
         taps[0] = x; 
         // error sig
-		*outs1++  = e;
+		//*outs1++  = e;
+        outs1[j] = e;
 
         //**** begin source/filter method here *****************
-        double s = (*ins2++);
-        double src_filtered = 0;
 
         // process zeros to poles / FIR to IIR
         src_w[0] = 1;
         for(int i = 0; i < L; i++){
             src_w[i+1] = -w[i];
         }
-        
-        src_filtered = -1 * s; // B
-        for(int i = 1; i < L+1; i++){ // As
-            src_filtered -= src_w[i] * src_taps[i]; 
-        }
 
+        // shift delay taps
         for(int i = L; i > 0; i--){
             src_taps[i] = src_taps[i-1];
         }
-        src_taps[0] = src_filtered; 
 
-        *outs2++ = src_filtered;
-        //*outs2++ = s;
+        // compute denomenator
+        src_taps[0] = s; 
+        for(int i = 1; i <= L+1; i++){ // As
+            src_taps[0] -= src_w[i] * src_taps[i]; 
+        }
+
+        outs2[j] = src_taps[0];
+        j++;
 	}
 }  // end m_signal
